@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+require_relative '../lib/NasaFuelCalculation'
+
+if ARGV.length < 2
+  puts "Usage: #{File.basename(__FILE__)} mass [[action, gravity], ...]"
+  exit 1
+end
+
+mass = ARGV.shift.to_i
+route_str = ARGV.join(' ')
+
+begin
+  route = eval(route_str)
+rescue SyntaxError, SecurityError => e
+  puts "Error processing route: #{e.message}"
+  exit 1
+end
+
+unless route.is_a?(Array) && route.all? { |e| e.is_a?(Array) && e.length == 2 }
+  puts "Invalid route format. Must be [[action, gravity], ...]"
+  exit 1
+end
+
+total_fuel = NasaFuelCalculation.total_fuel_for_trip(mass, route)
+puts "Total fuel required: #{total_fuel} kg"
